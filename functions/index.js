@@ -3,6 +3,8 @@ const firebase = require('firebase-admin');
 const firebaseHelper = require('firebase-functions-helper');
 const express = require('express');
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser')();
+const cors = require('cors')({origins: true})
 
 firebase.initializeApp(functions.config().firebase);
 
@@ -16,8 +18,12 @@ const resultadosCollection = 'resultados';
 main.use('/api/v1', app);
 main.use(bodyParser.json());
 main.use(bodyParser.urlencoded({ extended: false }));
+app.use(cors);
+app.use(cookieParser);
 // webApi is your functions name, and you will pass main as 
 // a parameter
+
+
 
 // View a resultado
 app.get('/resultados/:id', (req, res) => {
