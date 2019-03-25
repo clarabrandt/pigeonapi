@@ -1,26 +1,35 @@
 const functions = require('firebase-functions');
-const firebase = require('firebase-admin');
+const firebase = require("firebase/app");
+require("firebase/auth");
+const admin = require('firebase-admin');
 const firebaseHelper = require('firebase-functions-helper');
 const express = require('express');
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser')();
 const cors = require('cors')({origins: true});
 
-firebase.initializeApp(functions.config().firebase);
+firebase.initializeApp();
+admin.initializeApp({
+  credential: admin.credential.applicationDefault(),
+  databaseURL: "https://pigeon-90548.firebaseio.com"
+});
 
-// export const auth = firebase.auth();
+// admin.initializeApp(functions.config().firebase);
+
 // auth.signInWithEmailAndPassword(email, pass);
 // auth.onAuthStateChanged(firebaseUser => {})
 
-const db = firebase.firestore();
+const db = admin.firestore();
 const app = express();
 const main = express();
-// const auth = firebase.auth();
-// const storage = firebase.storage();
+// const auth = admin.auth();
+// const storage = admin.storage();
 
 const resultadosCollection = 'resultados';
 const blogCollection = 'blog';
-const sobreCollection = 'sobre'
+const sobreCollection = 'sobre';
+const midiaCollection = 'midia';
+
 
 main.use('/api/v1', app);
 // main.use(bodyParser.json());
@@ -33,11 +42,11 @@ app.use(cookieParser);
 // a parameter
 
 // Sign in credentials
-// firebase.auth().signInWithEmailAndPassword(email, password)
+// admin.auth().signInWithEmailAndPassword(email, password)
 //   .catch(error => console.error(error));
 
 // Sign out credentials
-// firebase.auth().signOut()
+// admin.auth().signOut()
 //     .then()
 //     .catch(err => console.error(err));
 
@@ -46,14 +55,16 @@ app.use(cookieParser);
  * AUTHENTICATION
  */
 
-// app.post('/login', (req, res) => {
-//   const email = req.body.username;
-//   const password = req.body.password;
 
-//   auth.signInWithEmailAndPassword(email, password)
-//     .then(data => res.status(200).send(data))
-//     .catch(error => console.error(error));
-// })
+
+app.post('/login', (req, res) => {
+  const emailQueOUsuarioDigitou = req.body.email;
+  const passwordQueOUsuarioDigitou = req.body.password;
+
+  admin.auth().getUserByEmail(emailQueOUsuarioDigitou)
+    .then(data => console.log('U LE LE', data))
+    .catch(err => console.log('U LA LA', err));
+})
 
 
 /**
@@ -68,6 +79,15 @@ app.get('/sobre', (req, res) => {
     .catch(err => console.error(err));
 })
 // Update info about
+app.post('/sobre', (req, res) => {
+  const sobre = new Object();
+  sobre.sobre= req.body.sobre;
+  firebaseHelper.firestore
+    .update(db, 'sobre', sobre)
+      .then(data => res.status(200).send(JSON.stringify(data)))
+      .catch(error => res.status(500).send(JSON.stringify(error)));
+})
+
 /**
  * RESULTS
  */
@@ -102,26 +122,6 @@ app.get('/blog', (req, res) => {
     .catch(err => console.error(err));
 })
 
-// post on blog
-// app.post('/blog',
-// {
-//     method: "POST",
-//     body: JSON.stringify({titulo: titulo, conteudo: conteudo})
-// })
-//   .then(data => res.status(200).send(data))
-//   .catch(err => console.error(err));
-// app.post('/blog', (req, res) => {
-//   firebaseHelper.firestore
-//     .backup(db, blogCollection)
-//     .then(data => res.status(200).send(data))
-//     .catch(err => console.error(err));
-// })
-// db.collection('blog').doc().set({
-//   titulo: inputTitle,
-//   conteudo: inputContent 
-// })
-//   .then(data => res.status(200).send(data))
-//   .catch(error => console.error(error))
 
 app.post('/blog', (req, res) => {
   const blog = new Object();
@@ -133,5 +133,35 @@ app.post('/blog', (req, res) => {
       .catch(error => res.status(500).send(JSON.stringify(error)));
 })
 
+
+app.delete('/blog', (req,res) => {
+  firebaseHelper.firestore
+    .deleteDocument(db, 'blog', req.body.key)
+      .then(data => res.status(200).send(JSON.stringify({key: req.body.key, data})))
+      .catch(error => res.status(500).send(JSON.stringify(error)));
+})
+
+/**
+ * MIDIA
+ */
+
+// View all midia posts
+app.get('/midia', (req, res) => {
+  firebaseHelper.firestore
+    .backup(db, midiaCollection)
+    .then(data => res.status(200).send(data))
+    .catch(err => console.error(err));
+})
+
+
+app.post('/midia', (req, res) => {
+  const midia = new Object();
+  midia.titulo= req.body.titulo;
+  midia.conteudo= req.body.conteudo;
+  firebaseHelper.firestore
+    .createNewDocument(db, 'midia', midia)
+      .then(data => res.status(200).send(JSON.stringify(data)))
+      .catch(error => res.status(500).send(JSON.stringify(error)));
+})
 
 exports.api = functions.https.onRequest(app);
