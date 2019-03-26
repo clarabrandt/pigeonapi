@@ -165,11 +165,11 @@ app.post('/midia', (req, res) => {
 })
 // Delete midia post
 
-// app.delete('/blog', (req,res) => {
-//   firebaseHelper.firestore
-//     .deleteDocument(db, 'blog', req.body.key)
-//       .then(data => res.status(200).send(JSON.stringify({key: req.body.key, data})))
-//       .catch(error => res.status(500).send(JSON.stringify(error)));
-// })
+app.delete('/midia', (req,res) => {
+  firebaseHelper.firestore
+    .deleteDocument(db, 'midia', req.body.key)
+      .then(data => res.status(200).send(JSON.stringify({key: req.body.key, data})))
+      .catch(error => res.status(500).send(JSON.stringify(error)));
+})
 
 exports.api = functions.https.onRequest(app);
