@@ -83,7 +83,7 @@ app.post('/sobre', (req, res) => {
   const sobre = new Object();
   sobre.sobre= req.body.sobre;
   firebaseHelper.firestore
-    .update(db, 'sobre', sobre)
+    .createNewDocument(db, 'sobre', sobre)
       .then(data => res.status(200).send(JSON.stringify(data)))
       .catch(error => res.status(500).send(JSON.stringify(error)));
 })
@@ -122,7 +122,7 @@ app.get('/blog', (req, res) => {
     .catch(err => console.error(err));
 })
 
-
+// Add blog post
 app.post('/blog', (req, res) => {
   const blog = new Object();
   blog.titulo= req.body.titulo;
@@ -133,7 +133,7 @@ app.post('/blog', (req, res) => {
       .catch(error => res.status(500).send(JSON.stringify(error)));
 })
 
-
+// Delete blog post
 app.delete('/blog', (req,res) => {
   firebaseHelper.firestore
     .deleteDocument(db, 'blog', req.body.key)
@@ -153,7 +153,7 @@ app.get('/midia', (req, res) => {
     .catch(err => console.error(err));
 })
 
-
+// Add midia post
 app.post('/midia', (req, res) => {
   const midia = new Object();
   midia.titulo= req.body.titulo;
@@ -163,5 +163,13 @@ app.post('/midia', (req, res) => {
       .then(data => res.status(200).send(JSON.stringify(data)))
       .catch(error => res.status(500).send(JSON.stringify(error)));
 })
+// Delete midia post
+
+// app.delete('/blog', (req,res) => {
+//   firebaseHelper.firestore
+//     .deleteDocument(db, 'blog', req.body.key)
+//       .then(data => res.status(200).send(JSON.stringify({key: req.body.key, data})))
+//       .catch(error => res.status(500).send(JSON.stringify(error)));
+// })
 
 exports.api = functions.https.onRequest(app);
