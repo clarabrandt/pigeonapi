@@ -1,3 +1,4 @@
+/* eslint-disable promise/no-nesting */
 const functions = require('firebase-functions');
 const firebase = require("firebase/app");
 require("firebase/auth");
@@ -78,13 +79,30 @@ app.get('/sobre', (req, res) => {
     .then(data => res.status(200).send(data))
     .catch(err => console.error(err));
 })
-// Update info about
+// Post info about
 app.post('/sobre', (req, res) => {
   const sobre = new Object();
   sobre.sobre= req.body.sobre;
   firebaseHelper.firestore
     .createNewDocument(db, 'sobre', sobre)
       .then(data => res.status(200).send(JSON.stringify(data)))
+      .catch(error => res.status(500).send(JSON.stringify(error)));
+})
+// Delete sobre
+app.delete('/sobre', (req,res) => {
+  firebaseHelper.firestore
+    .deleteDocument(db, 'sobre', req.body.key)
+      .then(data => res.status(200).send(JSON.stringify({key: req.body.key, data})))
+      .catch(error => res.status(500).send(JSON.stringify(error)));
+})
+
+// Update info about
+app.put('/sobre', (req, res) => {
+  const sobre = new Object();
+  sobre.sobre= req.body.sobre;
+  firebaseHelper.firestore
+    .updateDocument(db, 'sobre', req.body.key, sobre)
+      .then(data => res.status(200).send(JSON.stringify({key: req.body.key, data})))
       .catch(error => res.status(500).send(JSON.stringify(error)));
 })
 
@@ -102,10 +120,16 @@ app.get('/resultados', (req, res) => {
 
 // View a resultado
 app.get('/resultados/:id', (req, res) => {
-  firebaseHelper.firestore
-    .getDocument(db, resultadosCollection, req.params.id)
-    .then(doc => res.status(200).send(doc))
-    .catch(err => console.error(err));
+  const collectionRef = db.collection(resultadosCollection).doc(req.params.id).collection("arquivos").get()
+  
+  collectionRef.then(snapshot => {
+    const data = [];
+    snapshot.forEach(doc => {
+      data.push(doc.data());
+    })
+    return res.status(200).send(data)
+  })
+  .catch(err => console.error(err));
 })
 
 // Post resultado
@@ -141,6 +165,18 @@ app.delete('/blog', (req,res) => {
       .catch(error => res.status(500).send(JSON.stringify(error)));
 })
 
+//Update blog post
+app.put('/blog', (req, res) => {
+  const blog = new Object();
+  blog.titulo= req.body.titulo;
+  blog.date= req.body.date;
+  blog.conteudo= req.body.conteudo;
+  firebaseHelper.firestore
+    .updateDocument(db, 'blog', req.body.key, blog)
+      .then(data => res.status(200).send(JSON.stringify({key: req.body.key, data})))
+      .catch(error => res.status(500).send(JSON.stringify(error)));
+})
+
 /**
  * MIDIA
  */
@@ -163,11 +199,22 @@ app.post('/midia', (req, res) => {
       .then(data => res.status(200).send(JSON.stringify(data)))
       .catch(error => res.status(500).send(JSON.stringify(error)));
 })
-// Delete midia post
 
+// Delete midia post
 app.delete('/midia', (req,res) => {
   firebaseHelper.firestore
     .deleteDocument(db, 'midia', req.body.key)
+      .then(data => res.status(200).send(JSON.stringify({key: req.body.key, data})))
+      .catch(error => res.status(500).send(JSON.stringify(error)));
+})
+
+//Update midia post
+app.put('/midia', (req, res) => {
+  const midia = new Object();
+  midia.titulo= req.body.titulo;
+  midia.conteudo= req.body.conteudo;
+  firebaseHelper.firestore
+    .updateDocument(db, 'midia', req.body.key, midia)
       .then(data => res.status(200).send(JSON.stringify({key: req.body.key, data})))
       .catch(error => res.status(500).send(JSON.stringify(error)));
 })
