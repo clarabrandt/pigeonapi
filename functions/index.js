@@ -137,7 +137,7 @@ app.get('/resultados/:id', (req, res) => {
   collectionRef.then(snapshot => {
     const data = [];
     snapshot.forEach(doc => {
-      data.push(doc.data());
+      data.push({ id: doc.id, data: doc.data() });
     })
     return res.status(200).send(data)
   })
@@ -147,17 +147,18 @@ app.get('/resultados/:id', (req, res) => {
 // Create a resultado file entry
 app.post('/resultados/:id', (req, res) => {
   const resultado = new Object();
-  resultado.id = req.params.id;
-  resultado.name = req.body.name;
-  resultado.url = req.body.url;
+        resultado.name = req.body.name;
+        resultado.url = req.body.url;
 
   const collectionRef = db.collection(resultadosCollection)
                           .doc(req.params.id)
                           .collection("arquivos")
                           .add(resultado);
 
-  collectionRef.then(_ => res.status(200).send({success: true}))
-  .catch(error => res.status(500).send(JSON.stringify(error)));
+  collectionRef.then(response => {
+    return res.status(200).send({ success: true, id: response.id })
+  })
+  .catch(err => console.error(err));
 })
 
 // Post resultado
