@@ -1,7 +1,7 @@
 /* eslint-disable promise/no-nesting */
 const functions = require('firebase-functions');
-const firebase = require("firebase/app");
-require("firebase/auth");
+// const firebase = require("firebase/app");
+// require("firebase/auth");
 const admin = require('firebase-admin');
 const firebaseHelper = require('firebase-functions-helper');
 const express = require('express');
@@ -9,7 +9,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser')();
 const cors = require('cors')({origins: true});
 
-firebase.initializeApp();
+// firebase.initializeApp();
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
   databaseURL: "https://pigeon-90548.firebaseio.com"
@@ -119,6 +119,18 @@ app.get('/resultados', (req, res) => {
 })
 
 // View a resultado
+// app.get('/resultados/:id', (req, res) => {
+//   const collectionRef = db.collection(resultadosCollection).doc(req.params.id).collection("arquivos").get()
+  
+//   collectionRef.then(snapshot => {
+//     const data = [];
+//     snapshot.forEach(doc => {
+//       data.push(doc.data());
+//     })
+//     return res.status(200).send(data)
+//   })
+//   .catch(err => console.error(err));
+// })
 app.get('/resultados/:id', (req, res) => {
   const collectionRef = db.collection(resultadosCollection).doc(req.params.id).collection("arquivos").get()
   
@@ -130,6 +142,22 @@ app.get('/resultados/:id', (req, res) => {
     return res.status(200).send(data)
   })
   .catch(err => console.error(err));
+})
+
+// Create a resultado file entry
+app.post('/resultados/:id', (req, res) => {
+  const resultado = new Object();
+  resultado.id = req.params.id;
+  resultado.name = req.body.name;
+  resultado.url = req.body.url;
+
+  const collectionRef = db.collection(resultadosCollection)
+                          .doc(req.params.id)
+                          .collection("arquivos")
+                          .add(resultado);
+
+  collectionRef.then(_ => res.status(200).send({success: true}))
+  .catch(error => res.status(500).send(JSON.stringify(error)));
 })
 
 // Post resultado
