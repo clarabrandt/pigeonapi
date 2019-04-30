@@ -142,7 +142,6 @@ app.get("/resultados/:id", (req, res) => {
 // Create a resultado file entry
 app.post("/resultados/:id", (req, res) => {
   const resultado = new Object();
-  resultado.id = req.params.id;
   resultado.name = req.body.name;
   resultado.url = req.body.url;
 
@@ -153,8 +152,10 @@ app.post("/resultados/:id", (req, res) => {
     .add(resultado);
 
   collectionRef
-    .then(_ => res.status(200).send({ success: true }))
-    .catch(error => res.status(500).send(JSON.stringify(error)));
+    .then(response => {
+      return res.status(200).send({ success: true, id: response.id });
+    })
+    .catch(err => console.error(err));
 });
 
 // Post resultado
