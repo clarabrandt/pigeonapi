@@ -121,19 +121,40 @@ app.get("/resultados", (req, res) => {
     .catch(err => console.error(err));
 });
 
-// View a resultado
-app.get("/resultados/:id", (req, res) => {
-  const collectionRef = db
-    .collection(resultadosCollection)
-    .doc(req.params.id)
-    .collection("arquivos")
-    .get();
+// Create a resultado file entry
+app.post('/resultados/', (req, res) => {
+  const resultado = new Object();
+  resultado.name = req.body.name;
 
-  collectionRef
-    .then(snapshot => {
-      const data = [];
-      snapshot.forEach(doc => {
-        data.push(doc.data());
+  const collectionRef = db.collection(resultadosCollection)
+    .add(resultado);
+
+  collectionRef.then(response => {
+    return res.status(200).send({ success: true, id: response.id })
+  })
+    .catch(err => console.error(err));
+})
+
+app.get('/resultados/:id', (req, res) => {
+  const collectionRef = db.collection(resultadosCollection).doc(req.params.id).collection("arquivos").get()
+  
+  collectionRef.then(snapshot => {
+    const data = [];
+    snapshot.forEach(doc => {
+      data.push({ id: doc.id, data: doc.data() });
+// // View a resultado
+// app.get("/resultados/:id", (req, res) => {
+//   const collectionRef = db
+//     .collection(resultadosCollection)
+//     .doc(req.params.id)
+//     .collection("arquivos")
+//     .get();
+
+//   collectionRef
+//     .then(snapshot => {
+//       const data = [];
+//       snapshot.forEach(doc => {
+//         data.push(doc.data());
       });
       return res.status(200).send(data);
     })
@@ -143,21 +164,36 @@ app.get("/resultados/:id", (req, res) => {
 // Create a resultado file entry
 app.post("/resultados/:id", (req, res) => {
   const resultado = new Object();
-  resultado.name = req.body.name;
-  resultado.url = req.body.url;
+        resultado.name = req.body.name;
+        resultado.url = req.body.url;
 
-  const collectionRef = db
-    .collection(resultadosCollection)
-    .doc(req.params.id)
-    .collection("arquivos")
-    .add(resultado);
+  const collectionRef = db.collection(resultadosCollection)
+                          .doc(req.params.id)
+                          .collection("arquivos")
+                          .add(resultado);
 
-  collectionRef
-    .then(response => {
-      return res.status(200).send({ success: true, id: response.id });
-    })
-    .catch(err => console.error(err));
-});
+  collectionRef.then(response => {
+    return res.status(200).send({ success: true, id: response.id })
+  })
+  .catch(err => console.error(err));
+})
+// Delete a resultado file entry
+app.delete('/resultados/:id/:file', (req, res) => {
+  const resultado = new Object();
+        resultado.name = req.body.name;
+        resultado.url = req.body.url;
+
+  const collectionRef = db.collection(resultadosCollection)
+                          .doc(req.params.id)
+                          .collection("arquivos")
+                          .doc(req.params.file)
+                          .delete();
+
+  collectionRef.then(response => {
+    return res.status(200).send({ success: true, id: response.id })
+  })
+  .catch(err => console.error(err));
+})
 
 // Post resultado
 
