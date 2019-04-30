@@ -31,6 +31,7 @@ const blogCollection = "blog";
 const sobreCollection = "sobre";
 const midiaCollection = "midia";
 const fotosCollection = "fotos";
+const artigosCollection = "artigos";
 
 main.use("/api/v1", app);
 // main.use(bodyParser.json());
@@ -211,7 +212,7 @@ app.put("/blog", (req, res) => {
  * MIDIA
  */
 
-// View all midia posts
+// View all midia
 app.get("/midia", (req, res) => {
   firebaseHelper.firestore
     .backup(db, midiaCollection)
@@ -219,7 +220,7 @@ app.get("/midia", (req, res) => {
     .catch(err => console.error(err));
 });
 
-// Add midia post
+// Add midia
 app.post("/midia", (req, res) => {
   const midia = new Object();
   midia.titulo = req.body.titulo;
@@ -230,7 +231,7 @@ app.post("/midia", (req, res) => {
     .catch(error => res.status(500).send(JSON.stringify(error)));
 });
 
-// Delete midia post
+// Delete midia
 app.delete("/midia", (req, res) => {
   firebaseHelper.firestore
     .deleteDocument(db, "midia", req.body.key)
@@ -240,7 +241,7 @@ app.delete("/midia", (req, res) => {
     .catch(error => res.status(500).send(JSON.stringify(error)));
 });
 
-//Update midia post
+//Update midia
 app.put("/midia", (req, res) => {
   const midia = new Object();
   midia.titulo = req.body.titulo;
@@ -257,7 +258,7 @@ app.put("/midia", (req, res) => {
  * FOTOS
  */
 
-// View all foto posts
+// View all fotos
 app.get("/home", (req, res) => {
   firebaseHelper.firestore
     .backup(db, fotosCollection)
@@ -265,7 +266,7 @@ app.get("/home", (req, res) => {
     .catch(err => console.error(err));
 });
 
-// Add foto post
+// Add foto
 app.post("/home", (req, res) => {
   const foto = new Object();
   fotos.foto = req.body.foto;
@@ -275,7 +276,7 @@ app.post("/home", (req, res) => {
     .catch(error => res.status(500).send(JSON.stringify(error)));
 });
 
-// Delete foto post
+// Delete foto
 app.delete("/home", (req, res) => {
   firebaseHelper.firestore
     .deleteDocument(db, "fotos", req.body.key)
@@ -285,12 +286,55 @@ app.delete("/home", (req, res) => {
     .catch(error => res.status(500).send(JSON.stringify(error)));
 });
 
-//Update foto post
+//Update foto
 app.put("/home", (req, res) => {
   const foto = new Object();
   fotos.foto = req.body.foto;
   firebaseHelper.firestore
     .updateDocument(db, "fotos", req.body.key, foto)
+    .then(data =>
+      res.status(200).send(JSON.stringify({ key: req.body.key, data }))
+    )
+    .catch(error => res.status(500).send(JSON.stringify(error)));
+});
+/**
+ * ARTIGOS
+ */
+
+// View all artigos posts
+app.get("/home", (req, res) => {
+  firebaseHelper.firestore
+    .backup(db, artigosCollection)
+    .then(data => res.status(200).send(data))
+    .catch(err => console.error(err));
+});
+
+// Add artigo
+app.post("/home", (req, res) => {
+  const artigos = new Object();
+  artigos.title = req.body.title;
+  firebaseHelper.firestore
+    .createNewDocument(db, "artigos", fotos)
+    .then(data => res.status(200).send(JSON.stringify(data)))
+    .catch(error => res.status(500).send(JSON.stringify(error)));
+});
+
+// Delete artigo
+app.delete("/home", (req, res) => {
+  firebaseHelper.firestore
+    .deleteDocument(db, "artigos", req.body.key)
+    .then(data =>
+      res.status(200).send(JSON.stringify({ key: req.body.key, data }))
+    )
+    .catch(error => res.status(500).send(JSON.stringify(error)));
+});
+
+//Update artigo
+app.put("/home", (req, res) => {
+  const artigos = new Object();
+  artigos.title = req.body.title;
+  firebaseHelper.firestore
+    .updateDocument(db, "artigos", req.body.key, artigos)
     .then(data =>
       res.status(200).send(JSON.stringify({ key: req.body.key, data }))
     )
