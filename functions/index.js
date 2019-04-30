@@ -304,7 +304,7 @@ app.put("/midia", (req, res) => {
  */
 
 // View all fotos
-app.get("/home", (req, res) => {
+app.get("/fotos", (req, res) => {
   firebaseHelper.firestore
     .backup(db, fotosCollection)
     .then(data => res.status(200).send(data))
@@ -312,7 +312,7 @@ app.get("/home", (req, res) => {
 });
 
 // Add foto
-app.post("/home", (req, res) => {
+app.post("/fotos", (req, res) => {
   const foto = new Object();
   fotos.foto = req.body.foto;
   firebaseHelper.firestore
@@ -322,7 +322,7 @@ app.post("/home", (req, res) => {
 });
 
 // Delete foto
-app.delete("/home", (req, res) => {
+app.delete("/fotos", (req, res) => {
   firebaseHelper.firestore
     .deleteDocument(db, "fotos", req.body.key)
     .then(data =>
@@ -332,7 +332,7 @@ app.delete("/home", (req, res) => {
 });
 
 //Update foto
-app.put("/home", (req, res) => {
+app.put("/fotos", (req, res) => {
   const foto = new Object();
   fotos.foto = req.body.foto;
   firebaseHelper.firestore
@@ -347,7 +347,7 @@ app.put("/home", (req, res) => {
  */
 
 // View all artigos posts
-app.get("/home", (req, res) => {
+app.get("/artigos", (req, res) => {
   firebaseHelper.firestore
     .backup(db, artigosCollection)
     .then(data => res.status(200).send(data))
@@ -355,7 +355,7 @@ app.get("/home", (req, res) => {
 });
 
 // Add artigo
-app.post("/home", (req, res) => {
+app.post("/artigos", (req, res) => {
   const artigos = new Object();
   artigos.title = req.body.title;
   firebaseHelper.firestore
@@ -365,7 +365,7 @@ app.post("/home", (req, res) => {
 });
 
 // Delete artigo
-app.delete("/home", (req, res) => {
+app.delete("/artigos", (req, res) => {
   firebaseHelper.firestore
     .deleteDocument(db, "artigos", req.body.key)
     .then(data =>
@@ -375,7 +375,7 @@ app.delete("/home", (req, res) => {
 });
 
 //Update artigo
-app.put("/home", (req, res) => {
+app.put("/artigos", (req, res) => {
   const artigos = new Object();
   artigos.title = req.body.title;
   firebaseHelper.firestore
