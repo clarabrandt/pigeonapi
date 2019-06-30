@@ -356,13 +356,18 @@ app.get("/artigos", (req, res) => {
 
 // Add artigo
 app.post("/artigos", (req, res) => {
-  const artigos = new Object();
-  artigos.title = req.body.title;
-  firebaseHelper.firestore
-    .createNewDocument(db, "artigos", artigos)
-    .then(data => res.status(200).send(JSON.stringify(data)))
-    .catch(error => res.status(500).send(JSON.stringify(error)));
+  const artigo = new Object();
+  artigo.name = req.body.name;
+  artigo.url = req.body.url;
+
+  const collectionRef = db.collection(artigosCollection).add(artigo);
+  collectionRef
+    .then(response => {
+      return res.status(200).send({ success: true, id: response.id });
+    })
+    .catch(err => console.error(err));
 });
+
 
 // Delete artigo
 app.delete("/artigos", (req, res) => {
